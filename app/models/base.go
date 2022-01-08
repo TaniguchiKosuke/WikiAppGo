@@ -16,5 +16,5 @@ func dbConnect() *gorm.DB {
 
 func init() {
 	db := dbConnect()
-	db.AutoMigrate(&Document{})
+	db.AutoMigrate(&Document{}, &User{})
 }
