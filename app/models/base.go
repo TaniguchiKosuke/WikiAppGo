@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func dbConnect() *gorm.DB {
+func DbConnect() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		panic("cannot open the database")
@@ -15,6 +15,6 @@ func dbConnect() *gorm.DB {
 }
 
 func init() {
-	db := dbConnect()
+	db := DbConnect()
 	db.AutoMigrate(&Document{}, &User{})
 }

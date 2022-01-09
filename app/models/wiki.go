@@ -9,7 +9,7 @@ type User struct {
 	ID       string `gorm:"primaryKey"`
 	Username string
 	Email    string `gorm:"unique"`
-	Password string
+	Password []byte
 }
 
 type Document struct {
