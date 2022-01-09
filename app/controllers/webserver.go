@@ -20,7 +20,7 @@ func signup(c *gin.Context) {
 
 func StartWebServer() {
 	router := gin.Default()
-	router.Static("/assets", "./assets")
+	router.Static("/assets", "app/assets/")
 	router.LoadHTMLGlob("app/views/*")
 	router.GET("/", home)
 	router.GET("/user/login", login)
