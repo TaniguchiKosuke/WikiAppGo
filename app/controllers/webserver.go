@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
@@ -111,29 +111,28 @@ func createUser(username string, email string, password string) error {
 }
 
 func sessionCheck() gin.HandlerFunc {
-    return func(c *gin.Context) {
-
-        session := sessions.Default(c)
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
 		sessionInfo := SessionInfo{}
-        sessionInfo.UserId = session.Get("UserId")
+		sessionInfo.UserId = session.Get("UserId")
 
-        // セッションがない場合、ログインフォームをだす
-        if sessionInfo.UserId == nil {
-            log.Println("Not logged in")
-            c.Redirect(http.StatusMovedPermanently, "/user/login")
-            c.Abort()
-        } else {
-            c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
-            c.Next()
-        }
-    }
+		// セッションがない場合、ログインフォームをだす
+		if sessionInfo.UserId == nil {
+			log.Println("Not logged in")
+			c.Redirect(http.StatusMovedPermanently, "/user/login")
+			c.Abort()
+		} else {
+			c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
+			c.Next()
+		}
+	}
 }
 
 func StartWebServer() {
 	router := gin.Default()
 
 	store := cookie.NewStore([]byte("secret"))
-    router.Use(sessions.Sessions("mysession", store))
+	router.Use(sessions.Sessions("mysession", store))
 
 	router.Static("/assets", "app/assets/")
 	router.LoadHTMLGlob("app/views/*")
