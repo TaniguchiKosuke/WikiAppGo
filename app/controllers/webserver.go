@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
@@ -13,6 +15,10 @@ import (
 
 func home(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{})
+}
+
+type SessionInfo struct {
+	UserId interface{}
 }
 
 func loginPage(c *gin.Context) {
@@ -33,6 +39,11 @@ func login(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{"err": errMsg})
 		c.Abort()
 	} else {
+		//sessionの管理
+		session := sessions.Default(c)
+		session.Set("UserId", requestUser.ID)
+		session.Save()
+
 		log.Println("Login seccussed")
 		c.Redirect(302, "/")
 	}
@@ -44,6 +55,12 @@ func getUser(email string) models.User {
 
 	db.First(&user, "email = ?", email)
 	return user
+}
+
+func logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
 }
 
 func signupPage(c *gin.Context) {
@@ -93,11 +110,41 @@ func createUser(username string, email string, password string) error {
 	return nil
 }
 
+func sessionCheck() gin.HandlerFunc {
+    return func(c *gin.Context) {
+
+        session := sessions.Default(c)
+		sessionInfo := SessionInfo{}
+        sessionInfo.UserId = session.Get("UserId")
+
+        // セッションがない場合、ログインフォームをだす
+        if sessionInfo.UserId == nil {
+            log.Println("Not logged in")
+            c.Redirect(http.StatusMovedPermanently, "/user/login")
+            c.Abort()
+        } else {
+            c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
+            c.Next()
+        }
+    }
+}
+
 func StartWebServer() {
 	router := gin.Default()
+
+	store := cookie.NewStore([]byte("secret"))
+    router.Use(sessions.Sessions("mysession", store))
+
 	router.Static("/assets", "app/assets/")
 	router.LoadHTMLGlob("app/views/*")
-	router.GET("/", home)
+
+	loginRequired := router.Group("/")
+	loginRequired.Use(sessionCheck())
+	{
+		loginRequired.GET("/", home)
+		loginRequired.POST("/user/logout", logout)
+	}
+
 	router.GET("/user/login", loginPage)
 	router.POST("/user/login", login)
 	router.GET("/user/signup", signupPage)
