@@ -61,6 +61,7 @@ func logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
+	c.Redirect(302, "/")
 }
 
 func signupPage(c *gin.Context) {
@@ -119,7 +120,7 @@ func sessionCheck() gin.HandlerFunc {
 		// セッションがない場合、ログインフォームをだす
 		if sessionInfo.UserId == nil {
 			log.Println("Not logged in")
-			c.Redirect(http.StatusMovedPermanently, "/user/login")
+			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.Abort()
 		} else {
 			c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
@@ -141,12 +142,12 @@ func StartWebServer() {
 	loginRequired.Use(sessionCheck())
 	{
 		loginRequired.GET("/", home)
-		loginRequired.POST("/user/logout", logout)
+		loginRequired.POST("/logout", logout)
 	}
 
-	router.GET("/user/login", loginPage)
-	router.POST("/user/login", login)
-	router.GET("/user/signup", signupPage)
-	router.POST("/user/signup", signup)
-	router.Run()
+	router.GET("/login", loginPage)
+	router.POST("/login", login)
+	router.GET("/signup", signupPage)
+	router.POST("/signup", signup)
+	router.Run(":8000")
 }
