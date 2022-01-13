@@ -129,6 +129,14 @@ func sessionCheck() gin.HandlerFunc {
 	}
 }
 
+func createDocumentPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "create_document.html", gin.H{})
+}
+
+func createDocument(c *gin.Context) {
+
+}
+
 func StartWebServer() {
 	router := gin.Default()
 
@@ -143,6 +151,8 @@ func StartWebServer() {
 	{
 		loginRequired.GET("/", home)
 		loginRequired.POST("/logout", logout)
+		loginRequired.GET("/create/document/", createDocumentPage)
+		loginRequired.POST("/create/document/", createDocument)
 	}
 
 	router.GET("/login", loginPage)
