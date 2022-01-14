@@ -1,6 +1,7 @@
 package contorollers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,10 +12,6 @@ import (
 	"WikiAppGo/app/models"
 )
 
-func home(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", gin.H{})
-}
-
 func getRequestUser(c *gin.Context) models.User {
 	session := sessions.Default(c)
 	requestUserId := session.Get("UserId")
@@ -23,6 +20,14 @@ func getRequestUser(c *gin.Context) models.User {
 	var user *models.User
 	db.First(&user, "id = ?", requestUserId)
 	return *user
+}
+
+func index(c *gin.Context) {
+	db := models.DbConnect()
+	var documents []models.Document
+	user := getRequestUser(c)
+	db.Where("author_id = ?", user.ID).Find(&documents)
+	c.HTML(http.StatusOK, "index.html", gin.H{"documents": documents})
 }
 
 func createDocumentPage(c *gin.Context) {

@@ -18,7 +18,7 @@ func getRouter() {
 	loginRequired := router.Group("/")
 	loginRequired.Use(sessionCheck())
 	{
-		loginRequired.GET("/", home)
+		loginRequired.GET("/", index)
 		loginRequired.POST("/logout", logout)
 		loginRequired.GET("/create/document/", createDocumentPage)
 		loginRequired.POST("/create/document/", createDocument)

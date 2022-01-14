@@ -37,18 +37,14 @@
               </div>
               <small>And some small print.</small>
             </a>
+            {{range .documents}}
             <a href="#" class="list-group-item list-group-item-action">
               <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
+                <h5 class="mb-1">{{.Title}}</h5>
               </div>
-              <small class="text-muted">And some muted small print.</small>
+              <small class="text-muted">{{.Author}}</small>
             </a>
-            <a href="#" class="list-group-item list-group-item-action">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
-              </div>
-              <small class="text-muted">And some muted small print.</small>
-            </a>
+            {{end}}
         </div>
     
         <div class="card" style="width: 70%;margin: 12px auto;min-height: 400px;">
