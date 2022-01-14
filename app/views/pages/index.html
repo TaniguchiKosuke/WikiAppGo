@@ -1,0 +1,28 @@
+{{template "header" .}}
+    <div style="display: flex;">
+        <div class="list-group" style="width: 20%;margin-left: 0;">
+            <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">List group item heading</h5>
+              </div>
+              <small>And some small print.</small>
+            </a>
+            {{range .documents}}
+            <a href="#" class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{.Title}}</h5>
+              </div>
+              <small class="text-muted">{{.Author.Username}}</small>
+            </a>
+            {{end}}
+        </div>
+    
+        <div class="card" style="width: 70%;margin: 12px auto;min-height: 400px;">
+            <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            </div>
+        </div>
+    </div>
+{{template "footer" .}}

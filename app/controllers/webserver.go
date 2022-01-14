@@ -4,150 +4,65 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm/clause"
 
 	"WikiAppGo/app/models"
 )
 
-func home(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", gin.H{})
-}
-
-type SessionInfo struct {
-	UserId interface{}
-}
-
-func loginPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{})
-}
-
-func login(c *gin.Context) {
-	requestUser := getUser(c.PostForm("email"))
-
-	// DBからハッシュ化されたpasswordを取得
-	dbPassword := requestUser.Password
-	formPassword := c.PostForm("password")
-
-	//DBから取得したpasswordとformに入力されたpasswordの比較
-	if err := bcrypt.CompareHashAndPassword(dbPassword, []byte(formPassword)); err != nil {
-		log.Println("Login failed:", err)
-		errMsg := "パスワードが一致しません"
-		c.HTML(http.StatusBadRequest, "login.html", gin.H{"err": errMsg})
-		c.Abort()
-	} else {
-		//sessionの管理
-		session := sessions.Default(c)
-		session.Set("UserId", requestUser.ID)
-		session.Save()
-
-		log.Println("Login seccussed")
-		c.Redirect(302, "/")
-	}
-}
-
-func getUser(email string) models.User {
-	db := models.DbConnect()
-	var user models.User
-
-	db.First(&user, "email = ?", email)
-	return user
-}
-
-func logout(c *gin.Context) {
+func getRequestUser(c *gin.Context) models.User {
 	session := sessions.Default(c)
-	session.Clear()
-	session.Save()
+	requestUserId := session.Get("UserId")
+
+	db := models.DbConnect()
+	var user *models.User
+	db.First(&user, "id = ?", requestUserId)
+	return *user
 }
 
-func signupPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "signup.html", gin.H{})
+func index(c *gin.Context) {
+	db := models.DbConnect()
+	var documents []models.Document
+	user := getRequestUser(c)
+	db.Preload(clause.Associations).Where("author_id", user.ID).Order("created_at desc").Limit(8).Find(&documents)
+	c.HTML(http.StatusOK, "index.html", gin.H{"documents": documents})
 }
 
-func signup(c *gin.Context) {
-	var form models.User
-	if err := c.Bind(&form); err != nil {
-		c.HTML(http.StatusBadRequest, "signup.html", gin.H{"err": err})
-		c.Abort()
-	} else {
-		username := c.PostForm("username")
-		email := c.PostForm("email")
-		password := c.PostForm("password")
-		// 登録ユーザーが重複していた場合にはじく処理
-		if err := createUser(username, email, password); err != nil {
-			log.Println("email is already used:", err)
-			errMsg := "This Email is already used"
-			c.HTML(http.StatusBadRequest, "signup.html", gin.H{"err": errMsg})
-		}
-		c.Redirect(302, "/")
-	}
+func createDocumentPage(c *gin.Context) {
+	db := models.DbConnect()
+	var documents []models.Document
+	user := getRequestUser(c)
+	db.Preload(clause.Associations).Where("author_id", user.ID).Order("created_at desc").Limit(8).Find(&documents)
+	c.HTML(http.StatusOK, "create_document.html", gin.H{"documents": documents})
 }
 
-func createUser(username string, email string, password string) error {
-	passwordEncrypt, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+func createDocument(c *gin.Context) {
+	requestUser := getRequestUser(c)
 	db := models.DbConnect()
 
-	//User idのためのuuidを生成
+	//DocumentのprimaryKeyのためのuuidを生成
 	uuid, err := uuid.NewRandom()
 	if err != nil {
 		log.Println(err)
-		return err
 	}
 	id := uuid.String()
+	title := c.PostForm("title")
+	content := c.PostForm("content")
 
-	//新しくUserの作成
-	err = db.Create(&models.User{ID: id, Username: username, Email: email, Password: passwordEncrypt}).Error
-	if err != nil {
-		return err
+	document := models.Document{
+		ID:       id,
+		Title:    title,
+		Content:  content,
+		AuthorID: requestUser.ID,
+		Author:   requestUser,
 	}
-	return nil
-}
+	db.Create(&document)
 
-func sessionCheck() gin.HandlerFunc {
-    return func(c *gin.Context) {
-
-        session := sessions.Default(c)
-		sessionInfo := SessionInfo{}
-        sessionInfo.UserId = session.Get("UserId")
-
-        // セッションがない場合、ログインフォームをだす
-        if sessionInfo.UserId == nil {
-            log.Println("Not logged in")
-            c.Redirect(http.StatusMovedPermanently, "/user/login")
-            c.Abort()
-        } else {
-            c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
-            c.Next()
-        }
-    }
+	c.Redirect(302, "/")
 }
 
 func StartWebServer() {
-	router := gin.Default()
-
-	store := cookie.NewStore([]byte("secret"))
-    router.Use(sessions.Sessions("mysession", store))
-
-	router.Static("/assets", "app/assets/")
-	router.LoadHTMLGlob("app/views/*")
-
-	loginRequired := router.Group("/")
-	loginRequired.Use(sessionCheck())
-	{
-		loginRequired.GET("/", home)
-		loginRequired.POST("/user/logout", logout)
-	}
-
-	router.GET("/user/login", loginPage)
-	router.POST("/user/login", login)
-	router.GET("/user/signup", signupPage)
-	router.POST("/user/signup", signup)
-	router.Run()
+	getRouter()
 }
