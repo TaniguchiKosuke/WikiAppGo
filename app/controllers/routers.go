@@ -13,7 +13,8 @@ func getRouter() {
 	router.Use(sessions.Sessions("mysession", store))
 	
 	router.Static("/assets", "app/assets/")
-	router.LoadHTMLGlob("app/views/*")
+	router.LoadHTMLGlob("app/views/**/*")
+	
 	
 	loginRequired := router.Group("/")
 	loginRequired.Use(sessionCheck())
