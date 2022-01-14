@@ -1,13 +1,13 @@
 package contorollers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 
 	"WikiAppGo/app/models"
 )
@@ -26,7 +26,7 @@ func index(c *gin.Context) {
 	db := models.DbConnect()
 	var documents []models.Document
 	user := getRequestUser(c)
-	db.Where("author_id = ?", user.ID).Find(&documents)
+	db.Preload(clause.Associations).Where("author_id", user.ID).Order("created_at desc").Limit(8).Find(&documents)
 	c.HTML(http.StatusOK, "index.html", gin.H{"documents": documents})
 }
 

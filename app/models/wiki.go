@@ -10,5 +10,5 @@ type Document struct {
 	Title    string
 	Content  string
 	AuthorID string
-	Author   User
+	Author   User   `gorm:"foreignKey:AuthorID"`
 }
