@@ -23,6 +23,7 @@ func getRouter() {
 		loginRequired.POST("/logout", logout)
 		loginRequired.GET("/create/document/", createDocumentPage)
 		loginRequired.POST("/create/document/", createDocument)
+		loginRequired.GET("/document/detail/:id/", getDocumentDetail)
 	}
 	
 	router.GET("/login", loginPage)
