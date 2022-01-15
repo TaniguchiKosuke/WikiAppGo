@@ -2,12 +2,11 @@
     <div style="display: flex;">
         {{template "documents_list" .}}
     
-        <div class="card" style="width: 70%;margin: 12px auto;min-height: 400px;">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="/create/document" class="card" style="width: 70%;margin: 12px auto;min-height: 400px;text-decoration: none;color: black;">
+            <div class="card-body text-center">
+                <h3>記録を追加ましょう!</h3>
+                <h5>タップして追加</h5>
             </div>
-        </div>
+        </a>
     </div>
 {{template "footer" .}}

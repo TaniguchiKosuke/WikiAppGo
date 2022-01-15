@@ -23,13 +23,13 @@
             {{end}}
         </div>
     
-        <div class="card" style="width: 70%;margin: 12px auto;min-height: 400px;">
+        <div class="card" style="border-color:red;width: 70%;margin: 12px auto;height: 200px;">
             <div class="card-body" style="position:relative;">
-                <a href="" class="btn btn-success" style="position: absolute;top: 12px;right: 12px;">編集</a>
-                <a href="/delete/document/confirm/{{.document.ID}}/" class="btn btn-danger" style="position: absolute;top: 12px;right: 80px;">削除</a> 
+                <a href="/document/detail/{{.document.ID}}/" class="btn btn-outline-primary" style="position: absolute;bottom: 12px;left: 12px;">キャンセル</a>
+                <a href="/delete/document/{{.document.ID}}/" class="btn btn-danger" style="position: absolute;bottom: 12px;left: 132px;">削除</a> 
                 <h6 class="card-subtitle mb-2 text-muted">作成日: {{.document.CreatedAt.Format "2006/01/02"}}</h6>
                 <h3 class="card-title">{{.document.Title}}</h3>
-                <p class="card-text" style="font-size: 20px;">{{.document.Content}}</p>
+                <p class="card-text" style="font-size: 20px;">本当に削除しますか？</p>
             </div>
         </div>
     </div>

@@ -78,6 +78,30 @@ func getDocumentDetail(c *gin.Context) {
 		})
 }
 
+func deleteDocumentConfirm(c *gin.Context) {
+	db := models.DbConnect()
+	user := getRequestUser(c)
+	documents := commons.GetDocumentsList(user, db)
+	var document models.Document
+	documentId := c.Param("id")
+	db.Where("id = ?", documentId).First(&document)
+	c.HTML(
+		http.StatusOK,
+		"delete_document_confirm.html",
+		gin.H{
+			"documents": documents,
+			"document": document,
+		})
+}
+
+func deleteDocument(c *gin.Context) {
+	db := models.DbConnect()
+	documentId := c.Param("id")
+	var document models.Document
+	db.Where("id = ?", documentId).Delete(&document)
+	c.Redirect(302, "/")
+}
+
 func StartWebServer() {
 	getRouter()
 }

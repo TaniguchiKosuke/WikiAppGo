@@ -24,6 +24,8 @@ func getRouter() {
 		loginRequired.GET("/create/document/", createDocumentPage)
 		loginRequired.POST("/create/document/", createDocument)
 		loginRequired.GET("/document/detail/:id/", getDocumentDetail)
+		loginRequired.GET("/delete/document/confirm/:id/", deleteDocumentConfirm)
+		loginRequired.DELETE("/delete/document/:id/", deleteDocument)
 	}
 	
 	router.GET("/login", loginPage)
