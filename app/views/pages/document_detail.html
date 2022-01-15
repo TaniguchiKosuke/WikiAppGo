@@ -1,20 +1,25 @@
 {{template "header" .}}
     <div style="display: flex;">
         <div class="list-group" style="width: 20%;margin-left: 0;">
-            <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
-              </div>
-              <small>And some small print.</small>
-            </a>
+            {{$document_detail_id := .document.ID}}
             {{range .documents}}
-            <a href="/document/detail/{{.ID}}/" class="list-group-item list-group-item-action">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{.Title}}</h5>
-              </div>
-              <p>{{.CreatedAt.Format "2006/01/02"}}</p>
-               <small class="text-muted">{{.Author.Username}}</small>
-            </a>
+                {{if eq .ID $document_detail_id}}
+                    <a href="/document/detail/{{.ID}}/" class="list-group-item list-group-item-action active">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.Title}}</h5>
+                        </div>
+                        <p>{{.CreatedAt.Format "2006/01/02"}}</p>
+                        <small class="text-muted">{{.Author.Username}}</small>
+                    </a>
+                {{else}}
+                    <a href="/document/detail/{{.ID}}/" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.Title}}</h5>
+                        </div>
+                        <p>{{.CreatedAt.Format "2006/01/02"}}</p>
+                        <small class="text-muted">{{.Author.Username}}</small>
+                    </a>
+                {{end}}
             {{end}}
         </div>
     

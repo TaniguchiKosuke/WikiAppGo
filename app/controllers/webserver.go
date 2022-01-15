@@ -68,8 +68,6 @@ func getDocumentDetail(c *gin.Context) {
 	user := getRequestUser(c)
 	documents := commons.GetDocumentsList(user, db)
 	db.Where("id = ?", documentId).First(&document)
-	log.Println("############")
-	log.Println(document.Title, document.Content)
 
 	c.HTML(
 		http.StatusOK,
