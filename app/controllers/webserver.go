@@ -102,6 +102,14 @@ func deleteDocument(c *gin.Context) {
 	c.Redirect(302, "/")
 }
 
+func updateDocumentPage(c *gin.Context) {
+
+}
+
+func updateDocument(c *gin.Context) {
+	
+}
+
 func StartWebServer() {
 	getRouter()
 }

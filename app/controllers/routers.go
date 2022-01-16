@@ -15,7 +15,6 @@ func getRouter() {
 	router.Static("/assets", "app/assets/")
 	router.LoadHTMLGlob("app/views/**/*")
 	
-	
 	loginRequired := router.Group("/")
 	loginRequired.Use(sessionCheck())
 	{
@@ -25,7 +24,9 @@ func getRouter() {
 		loginRequired.POST("/create/document/", createDocument)
 		loginRequired.GET("/document/detail/:id/", getDocumentDetail)
 		loginRequired.GET("/delete/document/confirm/:id/", deleteDocumentConfirm)
-		loginRequired.DELETE("/delete/document/:id/", deleteDocument)
+		loginRequired.GET("/delete/document/:id/", deleteDocument) //cannot work with DELETE
+		loginRequired.GET("/update/document/form/:id/", updateDocumentPage)
+		loginRequired.PATCH("/update/document/:id/", updateDocument)
 	}
 	
 	router.GET("/login", loginPage)
